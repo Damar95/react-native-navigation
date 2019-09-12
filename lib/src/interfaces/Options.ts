@@ -464,7 +464,7 @@ export interface OptionsFab {
   visible?: boolean;
   icon?: ImageRequireSource;
   iconColor?: Color;
-  alignHorizontally?: 'left' | 'right' | 'center';
+  alignHorizontally?: 'left' | 'right' | 'center' | 'start' | 'end';
   alignVertically?: 'top' | 'bottom';
   hideOnScroll?: boolean;
   size?: 'mini' | 'normal';
