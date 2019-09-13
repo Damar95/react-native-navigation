@@ -18,17 +18,17 @@ import androidx.core.view.WindowInsetsCompat;
 public abstract class ChildController<T extends ViewGroup> extends ViewController<T>  {
     private final Presenter presenter;
     private final ChildControllersRegistry childRegistry;
-    protected FabPresenter fabPresenter;
+    private FabPresenter fabPresenter;
 
     public ChildControllersRegistry getChildRegistry() {
         return childRegistry;
     }
 
-    public ChildController(Activity activity, ChildControllersRegistry childRegistry, String id, Presenter presenter, Options initialOptions) {
+    public ChildController(Activity activity, ChildControllersRegistry childRegistry, String id, Presenter presenter, FabPresenter fabPresenter, Options initialOptions) {
         super(activity, id, new NoOpYellowBoxDelegate(), initialOptions);
         this.presenter = presenter;
+        this.fabPresenter = fabPresenter;
         this.childRegistry = childRegistry;
-        fabPresenter = new FabPresenter();
     }
 
     @Override
@@ -45,6 +45,7 @@ public abstract class ChildController<T extends ViewGroup> extends ViewControlle
     @CallSuper
     public void setDefaultOptions(Options defaultOptions) {
         presenter.setDefaultOptions(defaultOptions);
+        fabPresenter.setDefaultOptions(defaultOptions);
     }
 
     @Override
@@ -68,14 +69,24 @@ public abstract class ChildController<T extends ViewGroup> extends ViewControlle
         super.applyOptions(options);
         Options resolvedOptions = resolveCurrentOptions();
         presenter.applyOptions(this, resolvedOptions);
+        fabPresenter.applyOptions(this, resolvedOptions.fabOptions);
     }
 
     @Override
     public void mergeOptions(Options options) {
         if (options == Options.EMPTY) return;
-        if (isViewShown()) presenter.mergeOptions(getView(), options);
+        if (isViewShown()) {
+            presenter.mergeOptions(getView(), options);
+            fabPresenter.mergeOptions(this, options.fabOptions);
+        }
         performOnParentController(parentController -> parentController.mergeChildOptions(options, this));
         super.mergeOptions(options);
+    }
+
+    @Override
+    public void applyBottomInset() {
+        super.applyBottomInset();
+        fabPresenter.applyBottomInset(getBottomInset());
     }
 
     @Override
