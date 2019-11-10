@@ -8,6 +8,7 @@ import android.view.animation.Animation;
 
 import com.reactnativenavigation.parse.FabOptions;
 import com.reactnativenavigation.parse.Options;
+import com.reactnativenavigation.utils.AnimationListenerAdapter;
 import com.reactnativenavigation.utils.CoordinatorLayoutUtils;
 import com.reactnativenavigation.utils.UiUtils;
 import com.reactnativenavigation.viewcontrollers.ChildController;
@@ -45,20 +46,10 @@ public class FabPresenter {
         FabOptions withDefault = options.copy().mergeWithDefault(defaultOptions.fabOptions);
         if (withDefault.hasValue()) {
             if (fab != null) {
-                fab.hide(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
+                fab.hide(new AnimationListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         showFab(withDefault, view);
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
                     }
                 });
             } else {
