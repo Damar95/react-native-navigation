@@ -19,6 +19,9 @@ const setDefaultOptions = () => Navigation.setDefaultOptions({
     selectedIconColor: Colors.primary,
     selectedTextColor: Colors.primary
   },
+  fab: {
+    backgroundColor: 'green'
+  },
   animations: {
     ...useSlowOpenScreenAnimations ? slowOpenScreenAnimations : {}   
   }

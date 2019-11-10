@@ -4,16 +4,18 @@ package com.reactnativenavigation.presentation;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.Animation;
 
 import com.reactnativenavigation.parse.FabOptions;
 import com.reactnativenavigation.parse.Options;
 import com.reactnativenavigation.utils.CoordinatorLayoutUtils;
 import com.reactnativenavigation.utils.UiUtils;
+import com.reactnativenavigation.viewcontrollers.ChildController;
 import com.reactnativenavigation.viewcontrollers.ViewController;
 import com.reactnativenavigation.views.Fab;
 import com.reactnativenavigation.views.FabMenu;
+import com.reactnativenavigation.views.FloatingActionButton;
 
-import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import static com.github.clans.fab.FloatingActionButton.SIZE_MINI;
@@ -21,8 +23,7 @@ import static com.github.clans.fab.FloatingActionButton.SIZE_NORMAL;
 import static com.reactnativenavigation.utils.CollectionUtils.*;
 
 public class FabPresenter {
-    private Fab fab;
-    private FabMenu fabMenu;
+    FloatingActionButton fab;
     private final int margin;
     private Options defaultOptions;
 
@@ -36,76 +37,109 @@ public class FabPresenter {
     }
 
     public void applyBottomInset(int bottomInset) {
-        applyBottomInsets(fab, bottomInset);
-        applyBottomInsets(fabMenu, bottomInset);
+        applyBottomInsets(bottomInset);
     }
 
-    public void applyOptions(ViewController view, FabOptions options) {
+    public void applyOptions(ChildController view, FabOptions options) {
         if (!view.getId().equals(options.layoutId)) return;
         FabOptions withDefault = options.copy().mergeWithDefault(defaultOptions.fabOptions);
         if (withDefault.hasValue()) {
-            if (fabMenu != null && fabMenu.getFabId().equals(withDefault.id.get())) {
-                fabMenu.bringToFront();
-                applyFabMenuOptions(fabMenu, withDefault, view);
-                fabMenu.setLayoutParams(createLayoutParams(withDefault));
-            } else if (fab != null && fab.getFabId().equals(withDefault.id.get())) {
-                fab.bringToFront();
-                applyFabOptions(fab, withDefault, view);
-                fab.setLayoutParams(createLayoutParams(withDefault));
-                fab.setOnClickListener(v -> view.sendOnNavigationButtonPressed(withDefault.id.get()));
+            if (fab != null) {
+                fab.hide(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        showFab(withDefault, view);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
             } else {
-                view.getView().addView(createFab(withDefault, view));
+                showFab(withDefault, view);
             }
+
+//            if (fab != null && fab.getFabId().equals(withDefault.id.get())) {
+//                fabMenu.bringToFront();
+//                applyFabMenuOptions(fabMenu, withDefault, view);
+//                fabMenu.setLayoutParams(createLayoutParams(withDefault));
+//            } else if (fab != null && fab.getFabId().equals(withDefault.id.get())) {
+//                fab.bringToFront();
+//                applyFabOptions(fab, withDefault, view);
+//                fab.setLayoutParams(createLayoutParams(withDefault));
+//                fab.setOnClickListener(v -> view.sendOnNavigationButtonPressed(withDefault.id.get()));
+//            } else {
+//                FloatingActionButton fab = createFab(withDefault, view);
+//                fab.asView().setVisibility(View.INVISIBLE);
+//                getFabContainer(view).getView().addView(fab.asView());
+//                fab.asView().post(fab::show);
+//            }
         } else {
             removeFab(view);
             removeFabMenu(view);
         }
     }
 
-    public void mergeOptions(ViewController view, FabOptions options) {
+    private void showFab(FabOptions withDefault, ChildController view) {
+        FloatingActionButton fab = createFab(withDefault, view);
+        fab.asView().setVisibility(View.INVISIBLE);
+        getFabContainer(view).getView().addView(fab.asView());
+        fab.asView().post(fab::show);
+    }
+
+    public void mergeOptions(ChildController view, FabOptions options) {
         if (options.hasValue()) {
-            if (fabMenu != null && fabMenu.getFabId().equals(options.id.get())) {
-                fabMenu.setLayoutParams(createLayoutParams(options));
-                fabMenu.bringToFront();
-                mergeFabMenuOptions(fabMenu, options, view);
-            } else if (fab != null && fab.getFabId().equals(options.id.get())) {
-                fab.setLayoutParams(createLayoutParams(options));
-                fab.bringToFront();
-                mergeFabOptions(fab, options, view);
-                fab.setOnClickListener(v -> view.sendOnNavigationButtonPressed(options.id.get()));
-            } else {
-                view.getView().addView(createFab(options, view));
-            }
+//            if (fabMenu != null && fabMenu.getFabId().equals(options.id.get())) {
+//                fabMenu.setLayoutParams(createLayoutParams(options));
+//                fabMenu.bringToFront();
+//                mergeFabMenuOptions(fabMenu, options, view);
+//            } else if (fab != null && fab.getFabId().equals(options.id.get())) {
+//                fab.setLayoutParams(createLayoutParams(options));
+//                fab.bringToFront();
+//                mergeFabOptions(fab, options, view);
+//                fab.setOnClickListener(v -> view.sendOnNavigationButtonPressed(options.id.get()));
+//            } else {
+//                getFabContainer(view).getView().addView(createFab(options, view).asView());
+//            }
         }
     }
 
-    private View createFab(FabOptions options, ViewController view) {
-        if (options.actionsArray.size() > 0) {
-            fabMenu = new FabMenu(view.getActivity(), options.id.get());
-            fabMenu.setLayoutParams(createLayoutParams(options));
-            applyFabMenuOptions(fabMenu, options, view);
-            return fabMenu;
-        } else {
+    private FloatingActionButton createFab(FabOptions options, ViewController view) {
+//        if (options.actionsArray.size() > 0) {
+//            fabMenu = new FabMenu(view.getActivity(), options.id.get());
+//            fabMenu.setLayoutParams(createLayoutParams(options));
+//            applyFabMenuOptions(fabMenu, options, view);
+//            return fabMenu;
+//        } else {
             fab = new Fab(view.getActivity(), options.id.get());
-            fab.setLayoutParams(createLayoutParams(options));
-            applyFabOptions(fab, options, view);
-            fab.setOnClickListener(v -> view.sendOnNavigationButtonPressed(options.id.get()));
+            {
+                View fab = this.fab.asView();
+                fab.setLayoutParams(createLayoutParams(options));
+                applyFabOptions((Fab) fab, options, view);
+                fab.setOnClickListener(v -> view.sendOnNavigationButtonPressed(options.id.get()));
+            }
             return fab;
-        }
+//        }
     }
 
-    private void removeFabMenu(ViewController view) {
-        if (fabMenu != null) {
-            fabMenu.hideMenuButton(true);
-            view.getView().removeView(fabMenu);
-            fabMenu = null;
-        }
+    private void removeFabMenu(ChildController view) {
+//        if (fabMenu != null) {
+//            fabMenu.hideMenuButton(true);
+//            getFabContainer(view).getView().removeView(fabMenu);
+//            fabMenu = null;
+//        }
     }
 
-    private void removeFab(ViewController view) {
+    private void removeFab(ChildController view) {
         if (fab != null) {
-            fab.hide(true);
-            view.getView().removeView(fab);
+            fab.hide();
+            getFabContainer(view).getView().removeView(fab.asView());
             fab = null;
         }
     }
@@ -205,10 +239,16 @@ public class FabPresenter {
         if (options.hideOnScroll.isFalse()) fabMenu.disableCollapse();
     }
 
-    private void applyBottomInsets(@Nullable View view, int bottomInset) {
-        if (view == null) return;
+    private void applyBottomInsets(int bottomInset) {
+        if (fab == null) return;
+        View view = fab.asView();
         CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) view.getLayoutParams();
         lp.bottomMargin = bottomInset + margin;
         view.requestLayout();
+    }
+
+    private ViewController getFabContainer(ChildController view) {
+        if (view.isRoot()) return view;
+        return getFabContainer(view.getParentController());
     }
 }

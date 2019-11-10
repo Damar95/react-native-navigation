@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.view.View;
+import android.view.animation.Animation;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.reactnativenavigation.anim.FabAnimator;
@@ -20,7 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 
-public class Fab extends FloatingActionButton implements FabAnimator {
+public class Fab extends FloatingActionButton implements FabAnimator, com.reactnativenavigation.views.FloatingActionButton {
     private String id;
     private FabCollapseBehaviour collapseBehaviour;
 
@@ -41,8 +43,19 @@ public class Fab extends FloatingActionButton implements FabAnimator {
     }
 
     @Override
+    public View asView() {
+        return this;
+    }
+
+    @Override
     public void hide() {
         hide(true);
+    }
+
+    @Override
+    public void hide(Animation.AnimationListener adapter) {
+        hide(true);
+        getAnimation().setAnimationListener(adapter);
     }
 
     public void enableCollapse(@Nullable ScrollEventListener scrollEventListener) {

@@ -60,19 +60,26 @@ class PushedScreen extends React.Component {
     );
   }
 
-  push = () => Navigation.push(this, {
-    component: {
-      name: Screens.Pushed,
-      passProps: this.createPassProps(),
-      options: {
-        topBar: {
-          title: {
-            text: `Pushed ${this.getStackPosition() + 1}`
-          }
-        }
-      }
+  push = () => Navigation.mergeOptions(this, {
+    fab: {
+      id: 'newFab',
+      icon: require('../../img/layouts.png')
     }
   });
+
+  // push = () => Navigation.push(this, {
+  //   component: {
+  //     name: Screens.Pushed,
+  //     passProps: this.createPassProps(),
+  //     options: {
+  //       topBar: {
+  //         title: {
+  //           text: `Pushed ${this.getStackPosition() + 1}`
+  //         }
+  //       }
+  //     }
+  //   }
+  // });
 
   pop = () => Navigation.pop(this);
 

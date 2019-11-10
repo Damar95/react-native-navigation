@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import com.reactnativenavigation.parse.Options;
 import com.reactnativenavigation.presentation.FabPresenter;
 import com.reactnativenavigation.presentation.Presenter;
+import com.reactnativenavigation.utils.Functions.Func1;
 import com.reactnativenavigation.utils.StatusBarUtils;
 import com.reactnativenavigation.viewcontrollers.navigator.Navigator;
 import com.reactnativenavigation.views.Component;
@@ -69,7 +70,10 @@ public abstract class ChildController<T extends ViewGroup> extends ViewControlle
         super.applyOptions(options);
         Options resolvedOptions = resolveCurrentOptions();
         presenter.applyOptions(this, resolvedOptions);
-        fabPresenter.applyOptions(this, resolvedOptions.fabOptions);
+        performOnRoot(root -> {
+            root.fabPresenter.applyOptions(this, resolvedOptions.fabOptions);
+            root.fabPresenter.applyBottomInset(getBottomInset());
+        });
     }
 
     @Override
@@ -98,7 +102,15 @@ public abstract class ChildController<T extends ViewGroup> extends ViewControlle
         childRegistry.onChildDestroyed(this);
     }
 
-    protected boolean isRoot() {
+    void performOnRoot(Func1<ChildController> task) {
+        if (isRoot()) {
+            task.run(this);
+        } else {
+            performOnParentController(parent -> parent.performOnRoot(task));
+        }
+    }
+
+    public boolean isRoot() {
         return getParentController() == null &&
                 !(this instanceof Navigator) &&
                 getView().getParent() != null;

@@ -65,7 +65,12 @@ class Options extends Component {
     }
   });
 
-  push = () => Navigation.push(this, Screens.Pushed);
+  push = () => Navigation.push(this, Screens.Pushed, {
+    fab: {
+      id: 'fab',
+      icon: require('../../img/star.png')
+    }
+  });
 
   hideTopBarInDefaultOptions = () => {
     Navigation.setDefaultOptions({

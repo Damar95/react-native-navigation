@@ -1,6 +1,7 @@
 package com.reactnativenavigation.views;
 
 import android.content.Context;
+import android.view.View;
 
 import com.github.clans.fab.FloatingActionMenu;
 import com.reactnativenavigation.anim.FabAnimator;
@@ -10,7 +11,7 @@ import com.reactnativenavigation.interfaces.ScrollEventListener;
 import java.util.HashSet;
 
 
-public class FabMenu extends FloatingActionMenu implements FabAnimator {
+public class FabMenu extends FloatingActionMenu implements FabAnimator, FloatingActionButton {
     private String id;
     private HashSet<Fab> actions = new HashSet<>();
     private FabCollapseBehaviour collapseBehaviour;
@@ -31,6 +32,11 @@ public class FabMenu extends FloatingActionMenu implements FabAnimator {
     @Override
     public void show() {
         showMenu(true);
+    }
+
+    @Override
+    public View asView() {
+        return this;
     }
 
     @Override
